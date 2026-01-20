@@ -2,7 +2,7 @@
 name = "api-gateway"
 version = "0.1.0"
 description = "FastAPI application"
-authors = ["Your Name <you@example.com>"]
+authors = ["Jackson Severino da Rocha <jacksonsr451@gmail.com>"]
 readme = "README.md"
 packages = [{ include = "app" }]
 
@@ -20,6 +20,7 @@ ruff = "^0.6.0"
 black = "^24.8.0"
 mypy = "^1.11.0"
 pre-commit = "^3.8.0"
+pytest-cov = "^5.0.0"
 
 [tool.black]
 line-length = 88
