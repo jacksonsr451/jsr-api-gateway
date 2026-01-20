@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "api-gateway"
+version = "0.1.0"
+description = "FastAPI application"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {extras = ["standard"], version = "^0.128.0"}
+uvicorn = { extras = ["standard"], version = "^0.30.0" }
+pydantic-settings = "^2.4.0"
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.0"
+httpx = "^0.27.0"
+ruff = "^0.6.0"
+
+[build-system]
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"
