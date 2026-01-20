@@ -1,0 +1,18 @@
+repos:
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        entry: poetry run black app
+        language: system
+        pass_filenames: false
+      - id: mypy
+        name: mypy
+        entry: poetry run mypy --install-types --non-interactive app
+        language: system
+        pass_filenames: false
+      - id: pytest
+        name: pytest
+        entry: poetry run pytest
+        language: system
+        pass_filenames: false
