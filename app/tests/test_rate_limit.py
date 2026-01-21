@@ -5,10 +5,12 @@ from app.main import create_app
 
 
 def _client(*, limit: int = 2, window_seconds: int = 60) -> TestClient:
-    settings = Settings(
-        rate_limit_enabled=True,
-        rate_limit_requests=limit,
-        rate_limit_window_seconds=window_seconds,
+    settings = Settings.model_validate(
+        {
+            "rate_limit_enabled": True,
+            "rate_limit_requests": limit,
+            "rate_limit_window_seconds": window_seconds,
+        }
     )
     app = create_app(settings)
     return TestClient(app)
