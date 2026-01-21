@@ -20,11 +20,20 @@ class Settings(BaseSettings):
     auth_service_validate_path: str = "/auth/validate"
     auth_service_authorize_path: str = "/auth/authorize"
     auth_service_timeout_seconds: float = 5.0
+    rate_limit_enabled: bool = True
+    rate_limit_requests: int = 100
+    rate_limit_window_seconds: int = 60
+    rate_limit_exempt_paths: list[str] = []
+    rate_limit_key_header: str = "X-Forwarded-For"
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
 
     @field_validator(
-        "cors_allow_origins", "cors_allow_methods", "cors_allow_headers", mode="before"
+        "cors_allow_origins",
+        "cors_allow_methods",
+        "cors_allow_headers",
+        "rate_limit_exempt_paths",
+        mode="before",
     )
     @classmethod
     def parse_list_settings(cls, value: Any) -> list[str]:
