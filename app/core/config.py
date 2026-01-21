@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     cors_allow_methods: list[str] = ["*"]
     cors_allow_headers: list[str] = ["*"]
     cors_allow_credentials: bool = False
+    auth_service_base_url: str = "http://auth-service:8000"
+    auth_service_validate_path: str = "/auth/validate"
+    auth_service_authorize_path: str = "/auth/authorize"
+    auth_service_timeout_seconds: float = 5.0
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
 
