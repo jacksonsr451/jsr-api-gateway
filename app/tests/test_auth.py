@@ -18,13 +18,13 @@ def _build_app(client: AuthServiceClient) -> FastAPI:
     app.dependency_overrides[get_auth_service_client] = lambda: client
 
     @app.get("/protected")
-    def protected(
+    async def protected(
         context: AuthContext = Depends(require_authentication),
     ) -> dict[str, Any]:
         return {"subject": context.claims.get("sub")}
 
     @app.get("/admin")
-    def admin(
+    async def admin(
         context: AuthContext = Depends(require_authorization("admin:read")),
     ) -> dict[str, Any]:
         return {"ok": True}
@@ -39,7 +39,7 @@ def _json_payload(request: httpx.Request) -> dict[str, Any]:
 
 
 def _mock_transport() -> httpx.MockTransport:
-    def handler(request: httpx.Request) -> httpx.Response:
+    async def handler(request: httpx.Request) -> httpx.Response:
         auth_header = request.headers.get("Authorization", "")
         token = auth_header.replace("Bearer ", "", 1)
 
@@ -64,7 +64,7 @@ def _mock_transport() -> httpx.MockTransport:
     return httpx.MockTransport(handler)
 
 
-def _auth_client(transport: httpx.BaseTransport) -> AuthServiceClient:
+def _auth_client(transport: httpx.AsyncBaseTransport) -> AuthServiceClient:
     return AuthServiceClient(
         base_url="http://auth-service.local",
         timeout=1.0,
@@ -122,7 +122,7 @@ def test_authorization_allows_admin() -> None:
 
 
 def test_auth_service_unavailable_returns_503() -> None:
-    def handler(request: httpx.Request) -> httpx.Response:
+    async def handler(request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectError("boom", request=request)
 
     app = _build_app(_auth_client(httpx.MockTransport(handler)))

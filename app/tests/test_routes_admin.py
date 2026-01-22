@@ -10,7 +10,7 @@ from app.services.routes_store import RouteStore, get_route_store
 
 
 def _auth_client() -> AuthServiceClient:
-    def handler(request: httpx.Request) -> httpx.Response:
+    async def handler(request: httpx.Request) -> httpx.Response:
         auth_header = request.headers.get("Authorization", "")
         token = auth_header.replace("Bearer ", "", 1)
 

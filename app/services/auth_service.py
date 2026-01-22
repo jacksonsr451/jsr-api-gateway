@@ -30,7 +30,7 @@ class AuthServiceClient:
         timeout: float,
         validate_path: str,
         authorize_path: str,
-        transport: httpx.BaseTransport | None = None,
+        transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         self._base_url = base_url.rstrip("/")
         self._timeout = timeout
@@ -38,8 +38,8 @@ class AuthServiceClient:
         self._authorize_path = _normalize_path(authorize_path)
         self._transport = transport
 
-    def validate_token(self, token: str) -> dict[str, Any]:
-        response = self._request("POST", self._validate_path, token, payload=None)
+    async def validate_token(self, token: str) -> dict[str, Any]:
+        response = await self._request("POST", self._validate_path, token, payload=None)
         if response.status_code == status.HTTP_200_OK:
             return self._parse_claims(response)
         if response.status_code in (
@@ -49,8 +49,8 @@ class AuthServiceClient:
             raise AuthServiceError(response.status_code, "invalid_token")
         raise AuthServiceError(status.HTTP_502_BAD_GATEWAY, "auth_service_error")
 
-    def authorize(self, token: str, permission: str) -> None:
-        response = self._request(
+    async def authorize(self, token: str, permission: str) -> None:
+        response = await self._request(
             "POST",
             self._authorize_path,
             token,
@@ -67,7 +67,7 @@ class AuthServiceClient:
             raise AuthServiceError(status.HTTP_403_FORBIDDEN, "not_authorized")
         raise AuthServiceError(status.HTTP_502_BAD_GATEWAY, "auth_service_error")
 
-    def _request(
+    async def _request(
         self,
         method: str,
         path: str,
@@ -76,12 +76,12 @@ class AuthServiceClient:
     ) -> httpx.Response:
         headers = {"Authorization": f"Bearer {token}"}
         try:
-            with httpx.Client(
+            async with httpx.AsyncClient(
                 base_url=self._base_url,
                 timeout=self._timeout,
                 transport=self._transport,
             ) as client:
-                return client.request(method, path, headers=headers, json=payload)
+                return await client.request(method, path, headers=headers, json=payload)
         except httpx.RequestError as exc:
             raise AuthServiceError(
                 status.HTTP_503_SERVICE_UNAVAILABLE,
