@@ -59,11 +59,15 @@ def test_routes_crud(tmp_path) -> None:
     )
 
     assert response.status_code == 201
-    route_id = response.json()["id"]
+    route_id = response.json()["data"]["id"]
+
+    get_response = client.get(f"/api/v1/routes/{route_id}", headers=headers)
+    assert get_response.status_code == 200
+    assert get_response.json()["data"]["id"] == route_id
 
     list_response = client.get("/api/v1/routes", headers=headers)
     assert list_response.status_code == 200
-    assert len(list_response.json()) == 1
+    assert len(list_response.json()["data"]) == 1
 
     update_response = client.put(
         f"/api/v1/routes/{route_id}",
@@ -71,7 +75,32 @@ def test_routes_crud(tmp_path) -> None:
         headers=headers,
     )
     assert update_response.status_code == 200
-    assert update_response.json()["name"] == "users-v2"
+    assert update_response.json()["data"]["name"] == "users-v2"
 
     delete_response = client.delete(f"/api/v1/routes/{route_id}", headers=headers)
-    assert delete_response.status_code == 204
+    assert delete_response.status_code == 200
+    assert delete_response.json() == {"data": {"deleted": True}}
+
+
+def test_routes_create_validation_error(tmp_path) -> None:
+    store = RouteStore(str(tmp_path / "routes.yaml"))
+    app = create_app(Settings.model_validate({"rate_limit_enabled": False}))
+    app.dependency_overrides[get_route_store] = lambda: store
+    app.dependency_overrides[get_auth_service_client] = _auth_client
+    client = TestClient(app)
+    headers = {"Authorization": "Bearer admin-token"}
+
+    response = client.post(
+        "/api/v1/routes",
+        json={
+            "regex": r"^/users(/.*)?$",
+            "upstream_base_url": "http://users.local:8000",
+            "methods": ["GET"],
+        },
+        headers=headers,
+    )
+
+    assert response.status_code == 422
+    payload = response.json()
+    assert payload["error"]["code"] == "validation_error"
+    assert payload["error"]["details"]

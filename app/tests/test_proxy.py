@@ -110,3 +110,4 @@ def test_proxy_returns_404_when_no_route(tmp_path) -> None:
     )
 
     assert response.status_code == 404
+    assert response.json()["error"]["code"] == "route_not_found"
