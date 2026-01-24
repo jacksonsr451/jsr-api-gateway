@@ -6,6 +6,7 @@ from app.api.router import api_router
 from app.core.config import Settings, get_settings
 from app.core.exception_handlers import register_exception_handlers
 from app.core.logging import configure_logging
+from app.core.openapi import OPENAPI_DESCRIPTION, OPENAPI_TAGS
 from app.core.rate_limit import RateLimitMiddleware, RateLimiter
 
 
@@ -16,6 +17,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(
         title=settings.app_name,
         debug=settings.debug,
+        description=OPENAPI_DESCRIPTION,
+        openapi_tags=OPENAPI_TAGS,
         default_response_class=ORJSONResponse,
     )
     register_exception_handlers(app)
