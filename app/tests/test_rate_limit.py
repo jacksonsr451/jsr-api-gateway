@@ -27,7 +27,9 @@ def test_rate_limit_blocks_after_limit() -> None:
 
     assert response.status_code == 429
     assert response.headers["retry-after"].isdigit()
-    assert response.json() == {"detail": "rate_limited"}
+    assert response.json() == {
+        "error": {"code": "rate_limited", "message": "rate_limited"}
+    }
 
 
 def test_rate_limit_is_per_client() -> None:

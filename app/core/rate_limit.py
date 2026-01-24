@@ -7,8 +7,10 @@ from threading import Lock
 from typing import Callable, Iterable
 
 from fastapi import Request, status
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import ORJSONResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+
+from app.core.responses import build_error_payload
 
 
 @dataclass
@@ -91,9 +93,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         result = self._limiter.hit(key)
 
         if not result.allowed:
-            return JSONResponse(
+            return ORJSONResponse(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                content={"detail": "rate_limited"},
+                content=build_error_payload("rate_limited", "rate_limited"),
                 headers=_rate_limit_headers(result, blocked=True),
             )
 
