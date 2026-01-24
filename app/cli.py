@@ -7,7 +7,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi_cli.cli import main as fastapi_main
 
-_ENV_PATH = Path(__file__).resolve().parents[2] / ".env"
+_ENV_PATH = Path(__file__).resolve().parents[1] / ".env"
 
 
 def _load_env() -> None:
