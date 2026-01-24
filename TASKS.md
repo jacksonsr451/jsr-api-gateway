@@ -8,7 +8,7 @@ Marque as etapas conforme for concluindo. Use este arquivo como checklist.
 - [x] Etapa 4: Rate limiting + testes
 - [x] Etapa 5: Roteamento/proxy para microservicos + testes
 - [x] Etapa 6: Padronizacao de respostas/erros + testes
-- [ ] Etapa 7: OpenAPI centralizado/ajustes de docs + testes
+- [x] Etapa 7: OpenAPI centralizado/ajustes de docs + testes
 
 Detalhamento (opcional):
 - [x] Etapa 1.1: Health check (/health)
@@ -25,5 +25,5 @@ Detalhamento (opcional):
 - [x] Etapa 5.2: Testes de roteamento
 - [x] Etapa 6.1: Normalizacao de respostas/erros
 - [x] Etapa 6.2: Testes de erro padronizado
-- [ ] Etapa 7.1: Ajustes de OpenAPI centralizado
-- [ ] Etapa 7.2: Testes/validacao de docs
+- [x] Etapa 7.1: Ajustes de OpenAPI centralizado
+- [x] Etapa 7.2: Testes/validacao de docs
