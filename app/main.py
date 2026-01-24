@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import ORJSONResponse
 
 from app.api.router import api_router
 from app.core.config import Settings, get_settings
+from app.core.exception_handlers import register_exception_handlers
 from app.core.logging import configure_logging
 from app.core.rate_limit import RateLimitMiddleware, RateLimiter
 
@@ -14,7 +16,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(
         title=settings.app_name,
         debug=settings.debug,
+        default_response_class=ORJSONResponse,
     )
+    register_exception_handlers(app)
 
     app.add_middleware(
         CORSMiddleware,

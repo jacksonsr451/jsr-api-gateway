@@ -29,12 +29,12 @@ def get_bearer_token(
     return credentials.credentials
 
 
-def require_authentication(
+async def require_authentication(
     token: str = Depends(get_bearer_token),
     client: AuthServiceClient = Depends(get_auth_service_client),
 ) -> AuthContext:
     try:
-        claims = client.validate_token(token)
+        claims = await client.validate_token(token)
     except AuthServiceError as exc:
         headers = (
             {"WWW-Authenticate": "Bearer"}
@@ -50,12 +50,12 @@ def require_authentication(
 
 
 def require_authorization(permission: str):
-    def dependency(
+    async def dependency(
         context: AuthContext = Depends(require_authentication),
         client: AuthServiceClient = Depends(get_auth_service_client),
     ) -> AuthContext:
         try:
-            client.authorize(context.token, permission)
+            await client.authorize(context.token, permission)
         except AuthServiceError as exc:
             headers = (
                 {"WWW-Authenticate": "Bearer"}

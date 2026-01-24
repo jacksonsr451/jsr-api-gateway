@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from urllib.parse import urlsplit, urlunsplit
 
+from anyio import to_thread
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import Response
@@ -42,13 +43,13 @@ async def proxy_request(
     auth_client: AuthServiceClient = Depends(get_auth_service_client),
 ) -> Response:
     raw_path = f"/{path}" if path else "/"
-    route = store.match_route(request.method, raw_path)
+    route = await to_thread.run_sync(store.match_route, request.method, raw_path)
     if not route:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="route_not_found"
         )
 
-    _maybe_authorize(route, request, auth_client)
+    await _maybe_authorize(route, request, auth_client)
 
     upstream_path = _normalize_path(route.rewrite_path(raw_path))
     upstream_url = _build_upstream_url(route.upstream_base_url, upstream_path)
@@ -81,7 +82,7 @@ async def proxy_request(
     )
 
 
-def _maybe_authorize(
+async def _maybe_authorize(
     route: RouteConfig, request: Request, auth_client: AuthServiceClient
 ) -> dict:
     auth_config = route.auth or RouteAuth()
@@ -91,9 +92,9 @@ def _maybe_authorize(
 
     token = _extract_bearer_token(request)
     try:
-        claims = auth_client.validate_token(token)
+        claims = await auth_client.validate_token(token)
         if auth_config.permission:
-            auth_client.authorize(token, auth_config.permission)
+            await auth_client.authorize(token, auth_config.permission)
         if auth_config.roles:
             _ensure_roles(claims, auth_config.roles)
     except AuthServiceError as exc:

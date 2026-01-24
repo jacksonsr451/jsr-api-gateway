@@ -12,7 +12,7 @@ from app.services.routes_store import RouteStore, get_route_store
 
 
 def _auth_client() -> AuthServiceClient:
-    def handler(request: httpx.Request) -> httpx.Response:
+    async def handler(request: httpx.Request) -> httpx.Response:
         auth_header = request.headers.get("Authorization", "")
         token = auth_header.replace("Bearer ", "", 1)
 
@@ -42,7 +42,7 @@ def _auth_client() -> AuthServiceClient:
 
 
 def _proxy_client(record: dict) -> ProxyClient:
-    def handler(request: httpx.Request) -> httpx.Response:
+    async def handler(request: httpx.Request) -> httpx.Response:
         record["path"] = request.url.path
         record["query"] = request.url.query
         return httpx.Response(200, json={"proxied": True})
@@ -110,3 +110,4 @@ def test_proxy_returns_404_when_no_route(tmp_path) -> None:
     )
 
     assert response.status_code == 404
+    assert response.json()["error"]["code"] == "route_not_found"
